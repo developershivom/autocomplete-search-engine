@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoComplete Search Engine - Full Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e0e6ed;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(124, 58, 237, 0.2);
+            color: #a78bfa;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .search-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .operations-panel {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            border-radius: 2px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 18px 50px 18px 24px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            color: #f1f5f9;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #7c3aed;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: #64748b;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 1.2rem;
+        }
+
+        .suggestions-container {
+            margin-top: 20px;
+        }
+
+        .suggestion-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: #7c3aed;
+            transform: translateX(5px);
+        }
+
+        .suggestion-word {
+            font-size: 1.05rem;
+            color: #f1f5f9;
+        }
+
+        .suggestion-word .highlight {
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        .suggestion-freq {
+            background: rgba(124, 58, 237, 0.3);
+            color: #c4b5fd;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .operation-btn {
+            width: 100%;
+            padding: 16px 24px;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #f1f5f9;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .operation-btn:hover {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: #7c3aed;
+            transform: translateY(-2px);
+        }
+
+        .operation-btn.active {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            border-color: #7c3aed;
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+        }
+
+        .operation-icon {
+            font-size: 1.2rem;
+        }
+
+        .result-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+
+        .result-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #a78bfa;
+            margin-bottom: 15px;
+        }
+
+        .result-content {
+            color: #cbd5e1;
+            line-height: 1.8;
+        }
+
+        .result-item {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #f1f5f9;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #7c3aed;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1f3a 0%, #2d3250 100%);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #94a3b8;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .success-message {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">🔥 TRIE-POWERED</div>
+            <h1>AutoComplete Search Engine</h1>
+            <p class="subtitle">5,000-word dictionary • real-time suggestions • fuzzy correction</p>
+            <div class="stats">
+                <div class="stat-item">📚 5,000 words indexed</div>
+                <div class="stat-item">⚡ O(m) search time</div>
+                <div class="stat-item">🎯 ≤2 edit distance</div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Left: Search Section -->
+            <div class="search-section">
+                <h2 class="panel-title">Live Search & Autocomplete</h2>
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="mainSearchInput"
+                        placeholder="Start typing to search..."
+                        autocomplete="off"
+                    >
+                    <span class="search-icon">🔍</span>
+                </div>
+
+                <div class="suggestions-container" id="suggestionsContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">💡</div>
+                        <p>Type something to see suggestions...</p>
+                    </div>
+                </div>
+
+                <!-- Results Display Area -->
+                <div id="resultsArea"></div>
+            </div>
+
+            <!-- Right: Operations Panel -->
+            <div class="operations-panel">
+                <h2 class="panel-title">Trie Operations</h2>
+                
+                <button class="operation-btn" onclick="showInsertModal()">
+                    <span class="operation-icon">➕</span>
+                    <span>Insert Word</span>
+                </button>
+
+                <button class="operation-btn" onclick="showSearchModal()">
+                    <span class="operation-icon">🔎</span>
+                    <span>Search Word</span>
+                </button>
+
+                <button class="operation-btn" onclick="showTopKModal()">
+                    <span class="operation-icon">🏆</span>
+                    <span>Top-K Suggestions</span>
+                </button>
+
+                <button class="operation-btn" onclick="showSuggestModal()">
+                    <span class="operation-icon">💬</span>
+                    <span>Get Suggestions</span>
+                </button>
+
+                <button class="operation-btn" onclick="showCorrectModal()">
+                    <span class="operation-icon">✨</span>
+                    <span>Fuzzy Correction</span>
+                </button>
+
+                <div class="result-box" style="margin-top: 30px;">
+                    <div class="result-title">API Endpoints</div>
+                    <div class="result-content">
+                        <div class="result-item">
+                            <span style="color: #7c3aed; font-weight: 600;">GET</span>
+                            <span style="font-family: monospace; font-size: 0.85rem;">/suggest?prefix=</span>
+                        </div>
+                        <div class="result-item">
+                            <span style="color: #7c3aed; font-weight: 600;">GET</span>
+                            <span style="font-family: monospace; font-size: 0.85rem;">/search?word=</span>
+                        </div>
+                        <div class="result-item">
+                            <span style="color: #7c3aed; font-weight: 600;">GET</span>
+                            <span style="font-family: monospace; font-size: 0.85rem;">/correct?word=</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Insert Modal -->
+    <div class="modal" id="insertModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Insert New Word</h3>
+                <button class="close-btn" onclick="closeModal('insertModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Word to Insert</label>
+                <input type="text" id="insertWordInput" placeholder="Enter word...">
+            </div>
+            <div class="input-group">
+                <label>Initial Frequency (optional, default: 1)</label>
+                <input type="number" id="insertFreqInput" placeholder="1" value="1">
+            </div>
+            <button class="submit-btn" onclick="insertWord()">Insert Word</button>
+            <div id="insertResult"></div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="modal" id="searchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Search for Word</h3>
+                <button class="close-btn" onclick="closeModal('searchModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Word to Search</label>
+                <input type="text" id="searchWordInput" placeholder="Enter word...">
+            </div>
+            <button class="submit-btn" onclick="searchWord()">Search</button>
+            <div id="searchResult"></div>
+        </div>
+    </div>
+
+    <!-- Top-K Modal -->
+    <div class="modal" id="topKModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Top-K Suggestions</h3>
+                <button class="close-btn" onclick="closeModal('topKModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Prefix</label>
+                <input type="text" id="topKPrefixInput" placeholder="Enter prefix...">
+            </div>
+            <div class="input-group">
+                <label>K Value (number of results)</label>
+                <input type="number" id="topKValueInput" placeholder="5" value="5">
+            </div>
+            <button class="submit-btn" onclick="getTopK()">Get Top-K</button>
+            <div id="topKResult"></div>
+        </div>
+    </div>
+
+    <!-- Suggest Modal -->
+    <div class="modal" id="suggestModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Get All Suggestions</h3>
+                <button class="close-btn" onclick="closeModal('suggestModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Prefix</label>
+                <input type="text" id="suggestPrefixInput" placeholder="Enter prefix...">
+            </div>
+            <button class="submit-btn" onclick="getSuggestions()">Get Suggestions</button>
+            <div id="suggestResult"></div>
+        </div>
+    </div>
+
+    <!-- Correct Modal -->
+    <div class="modal" id="correctModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Fuzzy Correction</h3>
+                <button class="close-btn" onclick="closeModal('correctModal')">×</button>
+            </div>
+            <div class="input-group">
+                <label>Misspelled Word</label>
+                <input type="text" id="correctWordInput" placeholder="Enter word...">
+            </div>
+            <button class="submit-btn" onclick="correctWord()">Find Corrections</button>
+            <div id="correctResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        let debounceTimer;
+
+        // Main search input - live autocomplete
+        document.getElementById('mainSearchInput').addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            const query = e.target.value.trim();
+            
+            if (!query) {
+                document.getElementById('suggestionsContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💡</div>
+                        <p>Type something to see suggestions...</p>
+                    </div>
+                `;
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                fetch(`${API_BASE}/suggest?prefix=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        displaySuggestions(data.suggestions, query);
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        document.getElementById('suggestionsContainer').innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-icon">⚠️</div>
+                                <p>Error connecting to server. Make sure server.exe is running.</p>
+                            </div>
+                        `;
+                    });
+            }, 200);
+        });
+
+        function displaySuggestions(suggestions, query) {
+            const container = document.getElementById('suggestionsContainer');
+            
+            if (!suggestions || suggestions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <p>No suggestions found for "${query}"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = suggestions.map(item => {
+                const word = item.word;
+                const highlighted = word.replace(new RegExp(`^${query}`, 'i'), 
+                    `<span class="highlight">${query}</span>`);
+                
+                return `
+                    <div class="suggestion-item" onclick="selectSuggestion('${word}')">
+                        <span class="suggestion-word">${highlighted}</span>
+                        <span class="suggestion-freq">${item.frequency} searches</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectSuggestion(word) {
+            document.getElementById('mainSearchInput').value = word;
+            // Optionally trigger a search
+            fetch(`${API_BASE}/search?word=${encodeURIComponent(word)}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('resultsArea').innerHTML = `
+                        <div class="result-box">
+                            <div class="result-title">Search Result</div>
+                            <div class="result-content">
+                                <div class="result-item">
+                                    <span style="font-weight: 600; color: #f1f5f9;">Word:</span>
+                                    <span style="color: #a78bfa;">${data.word}</span>
+                                </div>
+                                <div class="result-item">
+                                    <span style="font-weight: 600; color: #f1f5f9;">Found:</span>
+                                    <span style="color: ${data.found ? '#86efac' : '#fca5a5'};">
+                                        ${data.found ? '✓ Yes' : '✗ No'}
+                                    </span>
+                                </div>
+                                <div class="result-item">
+                                    <span style="font-weight: 600; color: #f1f5f9;">Frequency:</span>
+                                    <span style="color: #c4b5fd;">${data.frequency} searches</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+        }
+
+        // Modal functions
+        function showInsertModal() {
+            document.getElementById('insertModal').classList.add('active');
+        }
+
+        function showSearchModal() {
+            document.getElementById('searchModal').classList.add('active');
+        }
+
+        function showTopKModal() {
+            document.getElementById('topKModal').classList.add('active');
+        }
+
+        function showSuggestModal() {
+            document.getElementById('suggestModal').classList.add('active');
+        }
+
+        function showCorrectModal() {
+            document.getElementById('correctModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Insert Word
+        async function insertWord() {
+            const word = document.getElementById('insertWordInput').value.trim();
+            const freq = parseInt(document.getElementById('insertFreqInput').value) || 1;
+            const resultDiv = document.getElementById('insertResult');
+
+            if (!word) {
+                resultDiv.innerHTML = '<div class="error-message">Please enter a word</div>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/insert`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ word: word, frequency: freq })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success-message">
+                            ✓ Successfully inserted "${data.word}" with frequency ${data.frequency}
+                        </div>
+                    `;
+                    // Clear inputs
+                    document.getElementById('insertWordInput').value = '';
+                    document.getElementById('insertFreqInput').value = '1';
+                } else {
+                    resultDiv.innerHTML = `<div class="error-message">${data.message}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = '<div class="error-message">Error connecting to server</div>';
+            }
+        }
+
+        // Search Word
+        async function searchWord() {
+            const word = document.getElementById('searchWordInput').value.trim();
+            const resultDiv = document.getElementById('searchResult');
+
+            if (!word) {
+                resultDiv.innerHTML = '<div class="error-message">Please enter a word</div>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/search?word=${encodeURIComponent(word)}`);
+                const data = await res.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="result-box" style="margin-top: 20px;">
+                        <div class="result-item">
+                            <span style="font-weight: 600;">Word:</span>
+                            <span style="color: #a78bfa;">${data.word}</span>
+                        </div>
+                        <div class="result-item">
+                            <span style="font-weight: 600;">Found:</span>
+                            <span style="color: ${data.found ? '#86efac' : '#fca5a5'};">
+                                ${data.found ? '✓ Yes' : '✗ No'}
+                            </span>
+                        </div>
+                        <div class="result-item">
+                            <span style="font-weight: 600;">Frequency:</span>
+                            <span style="color: #c4b5fd;">${data.frequency} searches</span>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                resultDiv.innerHTML = '<div class="error-message">Error connecting to server</div>';
+            }
+        }
+
+        // Get Top-K
+        async function getTopK() {
+            const prefix = document.getElementById('topKPrefixInput').value.trim();
+            const k = document.getElementById('topKValueInput').value || 5;
+            const resultDiv = document.getElementById('topKResult');
+
+            if (!prefix) {
+                resultDiv.innerHTML = '<div class="error-message">Please enter a prefix</div>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/suggest?prefix=${encodeURIComponent(prefix)}`);
+                const data = await res.json();
+                
+                const suggestions = data.suggestions.slice(0, k);
+                
+                if (suggestions.length === 0) {
+                    resultDiv.innerHTML = `<div class="error-message">No suggestions found for "${prefix}"</div>`;
+                    return;
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="result-box" style="margin-top: 20px;">
+                        <div class="result-title">Top ${suggestions.length} Suggestions</div>
+                        ${suggestions.map((item, idx) => `
+                            <div class="result-item">
+                                <span>${idx + 1}. ${item.word}</span>
+                                <span style="color: #a78bfa;">${item.frequency} searches</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (err) {
+                resultDiv.innerHTML = '<div class="error-message">Error connecting to server</div>';
+            }
+        }
+
+        // Get Suggestions
+        async function getSuggestions() {
+            const prefix = document.getElementById('suggestPrefixInput').value.trim();
+            const resultDiv = document.getElementById('suggestResult');
+
+            if (!prefix) {
+                resultDiv.innerHTML = '<div class="error-message">Please enter a prefix</div>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/suggest?prefix=${encodeURIComponent(prefix)}`);
+                const data = await res.json();
+                
+                if (data.suggestions.length === 0) {
+                    resultDiv.innerHTML = `<div class="error-message">No suggestions found for "${prefix}"</div>`;
+                    return;
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="result-box" style="margin-top: 20px;">
+                        <div class="result-title">All Suggestions (${data.suggestions.length})</div>
+                        ${data.suggestions.map(item => `
+                            <div class="result-item">
+                                <span>${item.word}</span>
+                                <span style="color: #a78bfa;">${item.frequency} searches</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (err) {
+                resultDiv.innerHTML = '<div class="error-message">Error connecting to server</div>';
+            }
+        }
+
+        // Correct Word
+        async function correctWord() {
+            const word = document.getElementById('correctWordInput').value.trim();
+            const resultDiv = document.getElementById('correctResult');
+
+            if (!word) {
+                resultDiv.innerHTML = '<div class="error-message">Please enter a word</div>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/correct?word=${encodeURIComponent(word)}`);
+                const data = await res.json();
+                
+                if (data.corrections.length === 0) {
+                    resultDiv.innerHTML = `<div class="error-message">No corrections found for "${word}"</div>`;
+                    return;
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="result-box" style="margin-top: 20px;">
+                        <div class="result-title">Fuzzy Corrections</div>
+                        ${data.corrections.map(item => `
+                            <div class="result-item">
+                                <span>${item.word}</span>
+                                <span style="color: #a78bfa;">${item.frequency} searches</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (err) {
+                resultDiv.innerHTML = '<div class="error-message">Error connecting to server</div>';
+            }
+        }
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // Press Enter to submit in modals
+        document.getElementById('searchWordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchWord();
+        });
+        document.getElementById('topKPrefixInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') getTopK();
+        });
+        document.getElementById('suggestPrefixInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') getSuggestions();
+        });
+        document.getElementById('correctWordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') correctWord();
+        });
+    </script>
+</body>
+</html>
