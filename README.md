@@ -11,7 +11,7 @@ A full-stack autocomplete search engine powered by a **Trie (Prefix Tree)** data
 | **Shivom Singh** | Backend Lead — Trie design, HTTP server, JSON API |
 | **Aditya Prakash** | Algorithm Specialist — Edit distance DP, fuzzy correction, Top-K sorting |
 | **Shelar Yash Kanifnath** | Frontend Engineer — UI/UX, glassmorphism design, real-time autocomplete |
-| **Tumma Abhinav** | Integration & QA — API wiring, CORS, corpus loading, testing |
+| **Tumma Abhinav** | Integration & QA — API wiring, CORS, corpus loading, testing, brainstorming |
 
 ---
 
